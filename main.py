@@ -26,9 +26,9 @@
 #
 # 	Classify employees based on good or bad standing according to equipment losses
 #       HOW TO DO:# Sum statement in SQL to check how many tools and employee has.
-#       # > 5 tools = bad standing 
+#       #Sum of tools > 5 tools = bad standing 
 #   
-#   LOGIN PAGE
+#   LOGIN PAGE --- Mack
 #       HOW TO DO: Reference youtube videos https://www.youtube.com/watch?v=RHu3mQodroM for example.
 #       #This will need to authenticate users and establish if they are admins or not as admin page will have access to additional tools employees do not have.
 ## 
@@ -269,4 +269,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())
+    
     
