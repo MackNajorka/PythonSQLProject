@@ -245,7 +245,7 @@ class App(QWidget):
                             );"""
                 cursor.execute(query)
                 
-                #when generating reports there needs to be createReport() function. This will display the reportID, EmpID, toolID, checkEvent type, time
+                #When generating reports there needs to be createReport() function. This will display the reportID, EmpID, toolID, checkEvent type, time
                 query = """ create table reports(
                             reportID INT NOT NULL AUTO_INCREMENT,
                             empID varchar(3),
@@ -256,7 +256,7 @@ class App(QWidget):
                             );"""
                 cursor.execute(query)
                 
-
+                
         except Error as e:
             print("Error while connecting to MySQL", e)
         finally:
@@ -269,5 +269,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())
-
-test push
+    
