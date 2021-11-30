@@ -1,36 +1,36 @@
-#  Reduce amount of processing time to check out tool to less 2 minutes 
+#  Reduce amount of processing time to check out tool to less 2 minutes  --- Ronell
 #       user needs to be indexed to have fast processing time, toolID is also going to be indexed.
 #  HOW TO DO:search for user they show up in list, query the database to see if item is in stock, \
 #       #if in stock AND user is in good standing, allow them to check out the tool then increment empInventory by 1 decrement WareHouseInventory by 1
 #
+# 	Provide each employee with periodic statement of their inventory and actions  
+#       HOW TO DO:#### INSTALL WIN10TOAST FOR PERIOD MESSAGES --- Ronell
+#
 #  Reduce amount of processing time of employee termination to less 2 minutes
 #  HOW TO DO:user needs to be indexed to have fast processing time
-#       #tool by tool decrement empInventory by 1 and then and increment warehouseInventory by 1 --- Jacob
+#  #tool by tool decrement empInventory by 1 and then and increment warehouseInventory by 1 --- Jacob
+#
+#  Automated notification system upon equipment arrival/check-in
+#       HOW TO DO:#HOW TO DO:On click function for return/withdraw a list box will display empInventory clicking an item in the list will return that item to WareHouseINventory
+#       #This click could also be something like --> takes you to tool page, displays information(checkout date/time) and offers you the option to return it. --- Jacob
 #
 #  Less than 30 seconds to locate employee to whom the returned equipment belongs 
-#       HOW TO DO:#Index date to improve searching time in combination with toolID to see who has checked out X tool. ---Randel
-
-#  System will validate that employee has proper skill classification for check out 
-#       HOW TO DO:#when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check ---Brittany
+#       HOW TO DO:#Index date to improve searching time in combination with toolID to see who has checked out X tool. --- Randel
 #
-#  Automated notification system upon equipment arrival/check-in 
-#       HOW TO DO:#HOW TO DO:On click function for return/withdraw a list box will display empInventory clicking an item in the list will return that item to WareHouseINventory
-#       #This click could also be something like --> takes you to tool page, displays information(checkout date/time) and offers you the option to return it.
-#       
-#  Staff has ability to obtain and create immediate access to records and reports 
+#  Staff has ability to obtain and create immediate access to records and reports ---Randel
 #      HOW TO DO:#Staff can query server for empInventory
-#       #Can search by reportID or by name
+#      #Can search by reportID or by name
+#  System will validate that employee has proper skill classification for check out 
+#      HOW TO DO:#when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check --- Brittany
 #
-# 	Provide each employee with periodic statement of their inventory and actions  
-#       HOW TO DO:#### INSTALL WIN10TOAST FOR PERIOD MESSAGES --- RONNELL
-#
-# 	Classify employees based on good or bad standing according to equipment losses
-#       HOW TO DO:# Sum statement in SQL to check how many tools and employee has.
-#       #Sum of tools > 5 tools = bad standing 
+# 	Classify employees based on good or bad standing according to equipment losses --- Brittany
+#      HOW TO DO:# Sum statement in SQL to check how many tools and employee has.
+#      #Sum of tools > 5 tools = bad standing     
 #   
 #   LOGIN PAGE --- Mack
 #       HOW TO DO: Reference youtube videos https://www.youtube.com/watch?v=RHu3mQodroM for example.
 #       #This will need to authenticate users and establish if they are admins or not as admin page will have access to additional tools employees do not have.
+#   Working GUI + Functions --- Mack
 ## 
 ##
 ##
