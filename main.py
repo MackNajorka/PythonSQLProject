@@ -270,4 +270,3 @@ if __name__ == '__main__':
     ex = App()
     sys.exit(app.exec_())
     
-    test code
