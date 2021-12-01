@@ -20,6 +20,7 @@
 #  Staff has ability to obtain and create immediate access to records and reports ---Randel
 #      HOW TO DO:#Staff can query server for empInventory
 #      #Can search by reportID or by name
+#
 #  System will validate that employee has proper skill classification for check out 
 #      HOW TO DO:#when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check --- Brittany
 #
@@ -79,6 +80,12 @@ class App(QWidget):
         button.move(100,160)
         button.clicked.connect(self.on_click_return)
 
+        #Randel create Generate Reports button
+        button = QPushButton('Generate Reports', self)
+        button.setToolTip('Generate Reports')
+        button.move(100,190)
+        button.clicked.connect(self.on_click_reports)
+
         # Create textbox
         self.textbox = QLineEdit(self)
         self.textbox.move(460, 20)
@@ -127,12 +134,12 @@ class App(QWidget):
                 cursor.close()
                 connection.close()
                 print("MySQL connection is closed")
+
 #stub functions to be filled out later
     def on_click_withdraw(self):
         print ("Withdraw")
     def on_click_return(self):
         print ("Return")
-
 
     def on_click_search(self):
         try:
@@ -159,6 +166,10 @@ class App(QWidget):
                 cursor.close()
                 connection.close()
                 print("MySQL connection is closed")
+    
+    # Randel onclickreports function start
+    def on_click_reports(self):
+        print("test")
 
     ##This is a button to install the database GB_Manufacturing2
     def on_click_install(self):
