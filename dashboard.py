@@ -1,22 +1,38 @@
-# • Reduce amount of processing time to check out tool to less 2 minutes 
+#  Reduce amount of processing time to check out tool to less 2 minutes  --- Ronell
 #       user needs to be indexed to have fast processing time, toolID is also going to be indexed.
-#       check if instock toolName in warehouseInventory, decrement inStock, increment employeeInventory
-# •	Reduce amount of processing time of employee termination to less 2 minutes
-#         user needs to be indexed to have fast processing time
-#         tool by tool remove from employee inventory and increment warehouseInventory
-# •	Less than 30 seconds to locate employee to whom the returned equipment belongs 
-#           Index date to improve searching time in combination with toolID to see who has checked out X tool.
-# •	System will validate that employee has proper skill classification for check out 
-#           when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check
-# •	Automated notification system upon equipment arrival/check-in 
-#           print user turned in X tools and date and time it, commit this to records
-# •	Staff has ability to obtain and create immediate access to records and reports 
-#           staff can view logs and add/remove/update reports
-# •	Provide each employee with periodic statement of their inventory and actions
-#           create a table just for reports to keep track of current inventory, can possibly display reports on login of last report
-# •	Classify employees based on good or bad standing according to equipment losses
-#           # > 5 tools = bad standing 
-#   Create GUI
+#  HOW TO DO:search for user they show up in list, query the database to see if item is in stock, \
+#       #if in stock AND user is in good standing, allow them to check out the tool then increment empInventory by 1 decrement WareHouseInventory by 1
+#
+# 	Provide each employee with periodic statement of their inventory and actions  
+#       HOW TO DO:#### INSTALL WIN10TOAST FOR PERIOD MESSAGES --- Ronell
+#
+#  Reduce amount of processing time of employee termination to less 2 minutes
+#  HOW TO DO:user needs to be indexed to have fast processing time
+#  #tool by tool decrement empInventory by 1 and then and increment warehouseInventory by 1 --- Jacob
+#
+#  Automated notification system upon equipment arrival/check-in
+#       HOW TO DO:#HOW TO DO:On click function for return/withdraw a list box will display empInventory clicking an item in the list will return that item to WareHouseINventory
+#       #This click could also be something like --> takes you to tool page, displays information(checkout date/time) and offers you the option to return it. --- Jacob
+#
+#  Less than 30 seconds to locate employee to whom the returned equipment belongs 
+#       HOW TO DO:#Index date to improve searching time in combination with toolID to see who has checked out X tool. --- Randel
+#       #Can try import random and use rand to assign tools random ID as they are withdrawn. 
+#
+#  Staff has ability to obtain and create immediate access to records and reports ---Randel
+#      HOW TO DO:#Staff can query server for empInventory
+#      #Can search by reportID or by name
+#
+#  System will validate that employee has proper skill classification for check out 
+#      HOW TO DO:#when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check --- Brittany
+#
+# 	Classify employees based on good or bad standing according to equipment losses --- Brittany
+#      HOW TO DO:# Sum statement in SQL to check how many tools and employee has.
+#      #Sum of tools > 5 tools = bad standing     
+#   
+#   LOGIN PAGE --- Mack
+#       HOW TO DO: Reference youtube videos https://www.youtube.com/watch?v=RHu3mQodroM for example.
+#       #This will need to authenticate users and establish if they are admins or not as admin page will have access to additional tools employees do not have.
+#   Working GUI + Functions --- Mack
 
 import mysql.connector
 from mysql.connector import Error
@@ -29,7 +45,7 @@ from PyQt5.uic import loadUi
 
 class dashboardApp(QDialog):
 
-    # DB settings @note: move to config file
+    # DB settings note: move to config file
     host='localhost'
     database='gb_manufacturing2'
     user='root'
@@ -38,7 +54,7 @@ class dashboardApp(QDialog):
     # DB vars
     connection = None
     selectedUserId = None
-
+    
     #
     # db functions
 
@@ -159,7 +175,7 @@ class dashboardApp(QDialog):
                 cursor.execute(query)
 
         except Error as e:
-            print("Error while con_click_install", e)
+            print("Error while on_click_install", e)
         finally:
             if  self.connection and self.connection.is_connected():
                 self.connection.commit()
@@ -300,21 +316,14 @@ class dashboardApp(QDialog):
 
     def __init__(self):
         super().__init__()
-        #self.title = 'GB_Manufacturing Dashboard'
-        # self.left = 10
-        # self.top = 10
-        # self.width = 640
-        # self.height = 400
         self.initUI()
 
         self.connection = self.dbConnect()
         if self.connection == None:
             print('Failed to connect to {} Database, try installing the db or check mysql settings'.format(self.host))
             # Enable Install button
+    #@note: Need to add exit button to app.
 
-    # def __del__(self):
-    #     super().__del__()
-    #     self.dbClose()
 
     def initUI(self):
         loadUi("dashboard.ui", self)      
@@ -327,6 +336,7 @@ class dashboardApp(QDialog):
         self.searchButton.clicked.connect(self.on_click_search)
         self.terminateButton.clicked.connect(self.on_click_terminate)
         self.searchResultsList.clicked.connect(self.on_click_searchResult)
+        self.logoutButton.clicked.connect(self.on_click_logout)
         
     @pyqtSlot()
     def on_click_allEmployees(self):
@@ -383,7 +393,10 @@ class dashboardApp(QDialog):
     def on_click_install(self):
         print('Installing {} Database'.format(self.host))
         self.dbInstall()
-
+    
+    def on_click_logout(self):
+        self.dbClose(self.connection)
+        self.connection = None
 #if __name__ == '__main__':
 #    app = QApplication(sys.argv)
 #    ex = App()

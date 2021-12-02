@@ -46,6 +46,7 @@ class CreateAcc(QDialog):
             login=Login()
             widget.addWidget(login)
             widget.setCurrentIndex(widget.currentIndex()+1)
+    
             
 app=QApplication(sys.argv)
 mainwindow=Login()
