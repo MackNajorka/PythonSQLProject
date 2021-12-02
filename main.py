@@ -80,12 +80,6 @@ class App(QWidget):
         button.move(100,160)
         button.clicked.connect(self.on_click_return)
 
-        #Randel create Generate Reports button
-        button = QPushButton('Generate Reports', self)
-        button.setToolTip('Generate Reports')
-        button.move(100,190)
-        button.clicked.connect(self.on_click_reports)
-
         # Create textbox
         self.textbox = QLineEdit(self)
         self.textbox.move(460, 20)
