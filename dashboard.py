@@ -43,6 +43,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.uic import loadUi
 
+# imports for report generation --- Randel
+import pandas as pd
+import datetime
+from plyer import notification
+
 class dashboardApp(QDialog):
 
     # DB settings note: move to config file
@@ -248,7 +253,7 @@ class dashboardApp(QDialog):
             query = """ UPDATE
                             WareHouseInventory
                         SET
-                            inStock = inStock + 1
+                            inStock = inStock - 1
                         WHERE
                             toolID = %s;
                     """
@@ -280,7 +285,7 @@ class dashboardApp(QDialog):
             query = """ UPDATE
                             WareHouseInventory
                         SET
-                            inStock = inStock - 1
+                            inStock = inStock + 1
                         WHERE
                             toolID = %s;
                     """
@@ -313,6 +318,10 @@ class dashboardApp(QDialog):
         finally:
             self.connection.commit()
             cursor.close()
+
+    # Randel generate Reports function
+    # Will export data from reports table to Excel file
+    #def generateReports():
 
     def __init__(self):
         super().__init__()
@@ -351,7 +360,32 @@ class dashboardApp(QDialog):
         print("Terminate Stub")
     
     def on_click_reports(self):
-        print("Generate Reports Stub")
+        try:
+            connection = mysql.connector.connect(host='localhost',
+                                    database='gb_manufacturing2',
+                                    user='root',
+                                    password='password')
+
+            reportsQuery = "SELECT * FROM reports"
+            employeeQuery = "SELECT * FROM employee WHERE numTools >= 3"
+
+            # Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(reportsQuery,connection)
+            df.to_csv("Inventory_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+
+            #Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(employeeQuery,connection)
+            df.to_csv("Employee_Tool_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+
+            #notify user of successful export
+            notification.notify(title="Export Status", 
+                                message=f"Data has been successfully exported to Excel.", timeout=10)
+
+        except Error as e:
+            print("Error generating report", e)
+        finally:
+            connection.close()
+        
 
     # @note: move to list vs a button
     def on_click_withdraw(self):
