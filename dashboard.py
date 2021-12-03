@@ -43,6 +43,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.uic import loadUi
 
+# imports for report generation --- Randel
+import pandas as pd
+import datetime
+from plyer import notification
+
 class dashboardApp(QDialog):
 
     # DB settings note: move to config file
@@ -314,6 +319,33 @@ class dashboardApp(QDialog):
             self.connection.commit()
             cursor.close()
 
+    # Randel generate Reports function
+    # Will export data from reports table to Excel file
+    def generateReports(self):
+        if self.connection is None or not self.connection.is_connected():
+            return
+
+        try:
+            cursor = self.connection.cursor()
+
+            query = "SELECT * FROM reports where reportTime = " + datetime.datetime.date
+
+            # Read data from SQL with pandas dataframe
+            df = pd.read_sql_query(query, cursor)
+
+            # Export to csv file
+            df.to_csv("Inventory_report"+datetime.datetime.date()+".csv", index=False)
+
+            #notify user of successful export
+            notification.notify(title="Export Status", 
+                                message=f"Data has been successfully exported to Excel.", timeout=10)
+
+        except Error as e:
+            print("Error generating report", e)
+        finally:
+            self.connection.commit()
+            cursor.close()
+
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -351,7 +383,7 @@ class dashboardApp(QDialog):
         print("Terminate Stub")
     
     def on_click_reports(self):
-        print("Generate Reports Stub")
+        self.generateReports()
 
     # @note: move to list vs a button
     def on_click_withdraw(self):
