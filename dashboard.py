@@ -366,13 +366,16 @@ class dashboardApp(QDialog):
                                     user='root',
                                     password='password')
 
-            query = "SELECT * FROM reports"
+            reportsQuery = "SELECT * FROM reports"
+            employeeQuery = "SELECT * FROM employee WHERE numTools >= 3"
 
-            # Read data from SQL with pandas dataframe
-            df = pd.read_sql_query(query,connection)
-
-            # Export to csv file
+            # Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(reportsQuery,connection)
             df.to_csv("Inventory_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+
+            #Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(employeeQuery,connection)
+            df.to_csv("Employee_Tool_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
 
             #notify user of successful export
             notification.notify(title="Export Status", 
