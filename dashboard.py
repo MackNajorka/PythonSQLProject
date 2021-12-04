@@ -33,6 +33,7 @@
 #       HOW TO DO: Reference youtube videos https://www.youtube.com/watch?v=RHu3mQodroM for example.
 #       #This will need to authenticate users and establish if they are admins or not as admin page will have access to additional tools employees do not have.
 #   Working GUI + Functions --- Mack
+#   #@note check terminate code.
 
 import mysql.connector
 from mysql.connector import Error
@@ -42,6 +43,7 @@ from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QWidget, QPushBu
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.uic import loadUi
+
 
 # imports for report generation --- Randel
 import pandas as pd
@@ -318,10 +320,43 @@ class dashboardApp(QDialog):
         finally:
             self.connection.commit()
             cursor.close()
+    
+    def dbReportGenerateToExcelFile(self): #Randels function revised
+        if self.connection is None or not self.connection.is_connected():
+            return
+        try:
+            reportsQuery = """  SELECT 
+                                    * 
+                                FROM 
+                                    reports 
+                                WHERE 
+                                    reportTime 
+                                BETWEEN 
+                                    curdate() 
+                                AND 
+                                    DATE_ADD(curdate(), INTERVAL 1 DAY);"""
+            
+            employeeQuery = """ SELECT 
+                                    * 
+                                FROM 
+                                    employee 
+                                WHERE 
+                                    numTools >= 3"""
 
-    # Randel generate Reports function
-    # Will export data from reports table to Excel file
-    #def generateReports():
+            # Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(reportsQuery,self.connection)
+            df.to_csv("reports/Inventory_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+
+            #Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(employeeQuery,self.connection)
+            df.to_csv("reports/Employee_Tool_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+
+            #notify user of successful export
+            notification.notify(title="Export Status", 
+                                message=f"Data has been successfully exported to Excel.", timeout=10)
+
+        except Error as e:
+            print("Error generating report", e)
 
     def __init__(self):
         super().__init__()
@@ -346,6 +381,7 @@ class dashboardApp(QDialog):
         self.terminateButton.clicked.connect(self.on_click_terminate)
         self.searchResultsList.clicked.connect(self.on_click_searchResult)
         self.logoutButton.clicked.connect(self.on_click_logout)
+    
         
     @pyqtSlot()
     def on_click_allEmployees(self):
@@ -358,35 +394,10 @@ class dashboardApp(QDialog):
             
     def on_click_terminate(self):
         print("Terminate Stub")
-    
+
     def on_click_reports(self):
-        try:
-            connection = mysql.connector.connect(host='localhost',
-                                    database='gb_manufacturing2',
-                                    user='root',
-                                    password='password')
-
-            reportsQuery = "SELECT * FROM reports WHERE reportTime BETWEEN curdate() AND DATE_ADD(curdate(), INTERVAL 1 DAY);"
-            employeeQuery = "SELECT * FROM employee WHERE numTools >= 3"
-
-            # Read data from SQL with pandas dataframe and export to csv file for report table
-            df = pd.read_sql_query(reportsQuery,connection)
-            df.to_csv("Inventory_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
-
-            #Read data from SQL with pandas dataframe and export to csv file for report table
-            df = pd.read_sql_query(employeeQuery,connection)
-            df.to_csv("Employee_Tool_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
-
-            #notify user of successful export
-            notification.notify(title="Export Status", 
-                                message=f"Data has been successfully exported to Excel.", timeout=10)
-
-        except Error as e:
-            print("Error generating report", e)
-        finally:
-            connection.close()
+        self.dbReportGenerateToExcelFile()
         
-
     # @note: move to list vs a button
     def on_click_withdraw(self):
         toolID = self.searchBox.text()

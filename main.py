@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QDialog, QApplication, QStackedWidget
 from PyQt5.uic import loadUi
 from PyQt5.uic.uiparser import WidgetStack
 from dashboard import dashboardApp
+from plyer import notification
 
 class Login(QDialog):
     def __init__(self):
@@ -46,7 +47,6 @@ class CreateAcc(QDialog):
             login=Login()
             widget.addWidget(login)
             widget.setCurrentIndex(widget.currentIndex()+1)
-    
             
 app=QApplication(sys.argv)
 mainwindow=Login()
