@@ -366,7 +366,7 @@ class dashboardApp(QDialog):
                                     user='root',
                                     password='password')
 
-            reportsQuery = "SELECT * FROM reports"
+            reportsQuery = "SELECT * FROM reports WHERE reportTime BETWEEN curdate() AND DATE_ADD(curdate(), INTERVAL 1 DAY);"
             employeeQuery = "SELECT * FROM employee WHERE numTools >= 3"
 
             # Read data from SQL with pandas dataframe and export to csv file for report table
