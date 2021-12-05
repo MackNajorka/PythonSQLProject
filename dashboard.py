@@ -35,6 +35,7 @@
 #   Working GUI + Functions --- Mack
 #   #@note check terminate code.
 
+
 import mysql.connector
 from mysql.connector import Error
 
@@ -61,6 +62,7 @@ class dashboardApp(QDialog):
     # DB vars
     connection = None
     selectedUserId = None
+    selectedtoolID = None
     
     #
     # db functions
@@ -171,13 +173,13 @@ class dashboardApp(QDialog):
                 cursor.execute(query)
 
                 #When generating reports there needs to be createReport() function. This will display the reportID, EmpID, toolID, reportType type, time
-                query = """ create table reports(
-                            reportID INT NOT NULL AUTO_INCREMENT,
-                            empID varchar(3),
-                            reportType varchar(10),
-                            toolID varchar(4),
-                            reportTime datetime DEFAULT CURRENT_TIMESTAMP,
-                            primary key (reportID)
+                query = """ CREATE TABLE reports(
+                                reportID INT NOT NULL AUTO_INCREMENT,
+                                empID varchar(3),
+                                reportType varchar(10),
+                                toolID varchar(4),
+                                reportTime datetime DEFAULT CURRENT_TIMESTAMP,
+                                primary key (reportID)
                             );"""
                 cursor.execute(query)
 
@@ -258,7 +260,8 @@ class dashboardApp(QDialog):
                             inStock = inStock - 1
                         WHERE
                             toolID = %s;
-                    """
+                    """ 
+            
             cursor.execute(query, (toolID,))
             self.connection.commit()
             cursor.close()
@@ -266,8 +269,75 @@ class dashboardApp(QDialog):
 
         except Error as e:
             print("Error while dbWareHouseInventoryWithdraw", e)
-         
 
+
+    def dbWareHouseAvailableTools(self, empID):
+        if self.connection is None or not self.connection.is_connected():
+            return
+        records = None
+        try:
+            cursor = self.connection.cursor(dictionary = True)
+            query = """ SELECT
+                            w.toolID, w.toolName 
+                        FROM
+                            WareHouseInventory w
+                        LEFT JOIN
+                            employee e
+                        ON
+                            e.skillID = w.skillID OR w.skillID = 'All'
+                        WHERE 
+                            w.inStock > 0 AND e.empID = %s;"""
+            
+            cursor.execute(query, (empID,))
+            records = cursor.fetchall()
+            cursor.close()         
+              
+        except Error as e:
+            print("Error while dbWareHouseAvailableTools", e)
+        return records
+
+    def dbWareHouseCheckedOutTools(self, empID, skipempty=True):
+        if self.connection is None or not self.connection.is_connected():
+            return
+        records = None
+        try:
+            cursor = self.connection.cursor(dictionary = True)
+            query = """ SELECT 
+                            toolID, reportType, COUNT(reportID) AS reportCount
+                        FROM 
+                            reports 
+                        WHERE 
+                            empID = %s 
+                        GROUP BY 
+                            toolID, reportType
+                        ORDER BY 
+                            toolID, reportType;"""
+            
+            cursor.execute(query, (empID,))
+            records = cursor.fetchall()
+            cursor.close()         
+            
+            tools={}
+            for record in records:
+                if record['toolID'] not in tools:
+                    tools[record['toolID']] = 0
+                if record['reportType'] == 'withdraw':
+                    tools[record['toolID']] += record['reportCount']
+                else:
+                    tools[record['toolID']] -= record['reportCount']
+            records = []
+            if tools != None:
+                for key, value in tools.items():
+                    if int (value) > 0 or not skipempty:
+                        records.append({
+                            'toolID': key,
+                            'count': value, 
+                        })
+            
+        except Error as e:
+            print("Error while dbWareHouseCheckedOutTools", e)
+        return records
+    
     def dbWareHouseInventoryReturn(self, empID, toolID):
         if self.connection is None or not self.connection.is_connected():
             return
@@ -324,7 +394,7 @@ class dashboardApp(QDialog):
         if self.connection is None or not self.connection.is_connected():
             return
         try:
-            reportsQuery = """  SELECT 
+            reportsQuery ="""  SELECT 
                                     * 
                                 FROM 
                                     reports 
@@ -333,22 +403,23 @@ class dashboardApp(QDialog):
                                 BETWEEN 
                                     curdate() 
                                 AND 
-                                    DATE_ADD(curdate(), INTERVAL 1 DAY);"""
-            
+                                    DATE_ADD(curdate(), INTERVAL 1 DAY)
+                         ;"""
+                                    
+            # Read data from SQL with pandas dataframe and export to csv file for report table
+            df = pd.read_sql_query(reportsQuery,self.connection)
+            df.to_csv(f"reports/Inventory_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
+
             employeeQuery = """ SELECT 
                                     * 
                                 FROM 
                                     employee 
                                 WHERE 
-                                    numTools >= 3"""
-
-            # Read data from SQL with pandas dataframe and export to csv file for report table
-            df = pd.read_sql_query(reportsQuery,self.connection)
-            df.to_csv("reports/Inventory_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
-
+                                    numTools >= 3
+                            ;"""
             #Read data from SQL with pandas dataframe and export to csv file for report table
             df = pd.read_sql_query(employeeQuery,self.connection)
-            df.to_csv("reports/Employee_Tool_report"+datetime.datetime.now().strftime('%b-%d-%Y')+".csv", index=False)
+            df.to_csv(f"reports/Employee_Tool_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
 
             #notify user of successful export
             notification.notify(title="Export Status", 
@@ -381,6 +452,11 @@ class dashboardApp(QDialog):
         self.searchResultsList.clicked.connect(self.on_click_searchResult)
         self.logoutButton.clicked.connect(self.on_click_logout)
         self.groupBoxEmpProfile.hide()
+        self.withdrawButton.hide()
+        self.returnButton.hide()
+        self.listWidgetAvailableTools.clicked.connect(self.on_click_selectAvailableTool)
+        self.listWidgetCheckedOut.clicked.connect(self.on_click_selectCheckedOutTool)
+        
         
     @pyqtSlot()
     def on_click_allEmployees(self):
@@ -398,24 +474,31 @@ class dashboardApp(QDialog):
     def on_click_reports(self):
         self.dbReportGenerateToExcelFile()
         
-    # @note: move to list vs a button
     def on_click_withdraw(self):
-        toolID = self.searchBox.text()
-        if self.selectedUserId == None:
+        toolID = self.selectedtoolID
+        if self.selectedtoolID == None:
             print(f"No user selected to withdraw tool {toolID}")
             return
         print(f"Withdrawing tool {toolID}")
         self.dbWareHouseInventoryWithdraw(self.selectedUserId, toolID)
+        self.profileRefresh()
 
-    # @note: move to list vs a button
     def on_click_return(self):
-        toolID = self.searchBox.text()
-        if self.selectedUserId == None:
+        toolID = self.selectedtoolID
+        if self.selectedtoolID == None:
             print(f"No user selected to return tool {toolID}")
             return
         print(f"Returning tool {toolID}")
         self.dbWareHouseInventoryReturn(self.selectedUserId, toolID)
-
+        self.profileRefresh()
+        tools = self.dbWareHouseCheckedOutTools(self.selectedUserId, skipempty= False)
+        for tool in tools:
+            if tool['toolID'] == toolID:
+                if int(tool['count']) == 0:
+                    self.selectedtoolID = None
+                    self.returnButton.hide()
+                break
+        
     # Search Emp Button Callback
     def on_click_search(self):
         self.searchResultsList.clear()
@@ -429,16 +512,34 @@ class dashboardApp(QDialog):
             print(f'User {empFirstName} not found')
 
     # Search List Selected User Callback
-    def on_click_searchResult(self, item):
+    def on_click_searchResult(self):
         emp = self.searchResultsList.currentItem()
         empString = emp.text()
         print(f'Selected users {empString}')
-        #self.selectedUserId = empString[:2]
         self.groupBoxEmpProfile.show()
         empID, empFName, empLName = empString.split()
         self.selectedUserId = empID
         self.groupBoxEmpProfile.setTitle(f'Profile {empFName} {empLName}')
+        self.profileRefresh()
+                
+    def on_click_selectAvailableTool(self):
+        tool = self.listWidgetAvailableTools.currentItem()
+        toolString = tool.text()
+        print(f'Selected tool to check out {toolString}')
+        self.selectedtoolID = toolString[:2]
+        self.withdrawButton.show()
+        self.returnButton.hide()
+
         
+    def on_click_selectCheckedOutTool(self):
+        tool = self.listWidgetCheckedOut.currentItem()
+        toolString = tool.text()
+        print(f'Selected tool to check in {toolString}')
+        self.selectedtoolID = toolString[:2]
+        self.returnButton.show()
+        self.withdrawButton.hide()
+        
+
     def on_click_install(self):
         print('Installing {} Database'.format(self.host))
         self.dbInstall()
@@ -446,8 +547,15 @@ class dashboardApp(QDialog):
     def on_click_logout(self):
         self.dbClose(self.connection)
         self.connection = None
-#if __name__ == '__main__':
-#    app = QApplication(sys.argv)
-#    ex = App()
-#    sys.exit(app.exec_())
-
+        
+    def profileRefresh(self):
+        tools = self.dbWareHouseAvailableTools(self.selectedUserId)    
+        self.listWidgetAvailableTools.clear()
+        if tools is not None:
+            for tool in tools:
+                self.listWidgetAvailableTools.addItem("{} {}".format(tool['toolID'], tool['toolName']))
+        tools = self.dbWareHouseCheckedOutTools(self.selectedUserId)        
+        self.listWidgetCheckedOut.clear()
+        if tools is not None:
+            for tool in tools:
+                self.listWidgetCheckedOut.addItem("{} count {}".format(tool['toolID'], tool['count']))
