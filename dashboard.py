@@ -231,8 +231,6 @@ class dashboardApp(QDialog):
         except Error as e:
             print("Error while on_click_search", e)
        
-            
-
         return records
 
     def dbWareHouseInventoryWithdraw(self, empID, toolID):
@@ -271,7 +269,6 @@ class dashboardApp(QDialog):
     def dbWareHouseInventoryReturn(self, empID, toolID):
         if self.connection is None or not self.connection.is_connected():
             return
-        self.dbReportCreate(empID, toolID, "return")
         try:
             # Check if still checked out
             cursor = self.connection.cursor()
@@ -423,17 +420,15 @@ class dashboardApp(QDialog):
         emps = self.dbEmployeeSearch(empFirstName)
         if emps is not None:
             for emp in emps:
-                self.searchResultsList.addItem("{} {}".format(emp['empFirstName'], emp['empLastName']))
+                self.searchResultsList.addItem("{} {} {}".format(emp['empID'], emp['empFirstName'], emp['empLastName']))
         else:
             print(f'User {empFirstName} not found')
 
     # Search List Selected User Callback
     def on_click_searchResult(self, item):
         emp = self.searchResultsList.currentItem()
-        print(f'Selected users {emp}')
-        # @note convert to emp ID
-        self.selectedUserId = "E1"
-        #self.selectedUserId = emp
+        print(f'Selected users {emp.text()}')
+        self.selectedUserId = emp.text()[:2]
 
     def on_click_install(self):
         print('Installing {} Database'.format(self.host))
