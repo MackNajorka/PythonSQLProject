@@ -1,7 +1,7 @@
 #   Reduce amount of processing time to check out tool to less 2 minutes  --- Ronell #Done by Mack except for standing check
 #   #missing good standing check. If employee inventory > 3 hide button to check out.
 #
-#   Provide each employee with periodic statement of their inventory and actions --- Ronell #Randel has taken over this.
+#   Provide each employee with periodic statement of their inventory and actions --- Ronell #Randel DONE
 #
 #   Reduce amount of processing time of employee termination to less 2 minutes
 #   HOW TO DO:user needs to be indexed to have fast processing time
@@ -17,7 +17,7 @@
 #
 #   System will validate that employee has proper skill classification for check out ---Brittany ---Done by Mack
 #
-#   Classify employees based on good or bad standing according to equipment count --- Brittany
+#   Classify employees based on good or bad standing according to equipment count --- Brittany DONE by Randel and Mack
 #   HOW TO DO:# Count statement in SQL to check how many tools an employee has.
 #   #Count of tools > 3 tools = bad standing     
 # 
