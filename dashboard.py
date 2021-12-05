@@ -384,6 +384,7 @@ class dashboardApp(QDialog):
         
     @pyqtSlot()
     def on_click_allEmployees(self):
+        self.searchResultsList.clear()
         emps = self.dbEmployeeAll()
         if emps is not None:
             for emp in emps:
@@ -417,6 +418,7 @@ class dashboardApp(QDialog):
 
     # Search Emp Button Callback
     def on_click_search(self):
+        self.searchResultsList.clear()
         empFirstName = self.searchBox.text()
         print(f'Searching for users {empFirstName}')
         emps = self.dbEmployeeSearch(empFirstName)
