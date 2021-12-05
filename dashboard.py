@@ -1,39 +1,28 @@
-#  Reduce amount of processing time to check out tool to less 2 minutes  --- Ronell
-#       user needs to be indexed to have fast processing time, toolID is also going to be indexed.
-#  HOW TO DO:search for user they show up in list, query the database to see if item is in stock, \
-#       #if in stock AND user is in good standing, allow them to check out the tool then increment empInventory by 1 decrement WareHouseInventory by 1
+#   Reduce amount of processing time to check out tool to less 2 minutes  --- Ronell #Done by Mack except for standing check
+#   #missing good standing check. If employee inventory > 3 hide button to check out.
 #
-# 	Provide each employee with periodic statement of their inventory and actions  
-#       HOW TO DO:#### INSTALL WIN10TOAST FOR PERIOD MESSAGES --- Ronell
+#   Provide each employee with periodic statement of their inventory and actions --- Ronell #Randel has taken over this.
 #
-#  Reduce amount of processing time of employee termination to less 2 minutes
-#  HOW TO DO:user needs to be indexed to have fast processing time
-#  #tool by tool decrement empInventory by 1 and then and increment warehouseInventory by 1 --- Jacob
+#   Reduce amount of processing time of employee termination to less 2 minutes
+#   HOW TO DO:user needs to be indexed to have fast processing time
+#   #tool by tool decrement empInventory by 1 and then and increment warehouseInventory by 1 --- Jacob
 #
-#  Automated notification system upon equipment arrival/check-in
-#       HOW TO DO:#HOW TO DO:On click function for return/withdraw a list box will display empInventory clicking an item in the list will return that item to WareHouseINventory
-#       #This click could also be something like --> takes you to tool page, displays information(checkout date/time) and offers you the option to return it. --- Jacob
+#   Automated notification system upon equipment arrival/check-in --- Jacob #Done by Mack
 #
-#  Less than 30 seconds to locate employee to whom the returned equipment belongs 
-#       HOW TO DO:#Index date to improve searching time in combination with toolID to see who has checked out X tool. --- Randel
-#       #Can try import random and use rand to assign tools random ID as they are withdrawn. 
+#   Less than 30 seconds to locate employee to whom the returned equipment belongs 
+#   HOW TO DO:#Index date to improve searching time in combination with toolID to see who has checked out X tool. --- Randel
+#   #Can try import random and use rand to assign tools random ID as they are withdrawn. 
 #
-#  Staff has ability to obtain and create immediate access to records and reports ---Randel
-#      HOW TO DO:#Staff can query server for empInventory
-#      #Can search by reportID or by name
+#   Staff has ability to obtain and create immediate access to records and reports ---Randel DONE
 #
-#  System will validate that employee has proper skill classification for check out 
-#      HOW TO DO:#when checking out tool look up wareHouseInventory and Compare SkillID with ToolID for proper check --- Brittany
+#   System will validate that employee has proper skill classification for check out ---Brittany ---Done by Mack
 #
-# 	Classify employees based on good or bad standing according to equipment losses --- Brittany
-#      HOW TO DO:# Sum statement in SQL to check how many tools and employee has.
-#      #Sum of tools > 5 tools = bad standing     
-#   
-#   LOGIN PAGE --- Mack
-#       HOW TO DO: Reference youtube videos https://www.youtube.com/watch?v=RHu3mQodroM for example.
-#       #This will need to authenticate users and establish if they are admins or not as admin page will have access to additional tools employees do not have.
-#   Working GUI + Functions --- Mack
-#   #@note check terminate code.
+#   Classify employees based on good or bad standing according to equipment count --- Brittany
+#   HOW TO DO:# Count statement in SQL to check how many tools an employee has.
+#   #Count of tools > 3 tools = bad standing     
+# 
+#   LOGIN PAGE --- Mack DONE
+#   Working GUI + Functions --- Mack DONE
 
 
 import mysql.connector
