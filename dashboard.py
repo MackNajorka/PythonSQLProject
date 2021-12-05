@@ -238,8 +238,10 @@ class dashboardApp(QDialog):
             return
 
         try:
-           # Check if still in stock
-           # check if already withdrawn
+            #@note 
+                #Check if still in stock
+                #check if already withdrawn
+                #check if toolID exists. Currently can withdraw anything.
             cursor = self.connection.cursor()
             query = """ UPDATE
                             employee
@@ -378,14 +380,14 @@ class dashboardApp(QDialog):
         self.terminateButton.clicked.connect(self.on_click_terminate)
         self.searchResultsList.clicked.connect(self.on_click_searchResult)
         self.logoutButton.clicked.connect(self.on_click_logout)
-    
+        self.groupBoxEmpProfile.hide()
         
     @pyqtSlot()
     def on_click_allEmployees(self):
         emps = self.dbEmployeeAll()
         if emps is not None:
             for emp in emps:
-                print(emp["empFirstName"], emp["empLastName"])
+                self.searchResultsList.addItem("{} {} {}".format(emp['empID'], emp['empFirstName'], emp['empLastName']))
         else:
             print(f'No users found...')
             
@@ -429,7 +431,9 @@ class dashboardApp(QDialog):
         emp = self.searchResultsList.currentItem()
         print(f'Selected users {emp.text()}')
         self.selectedUserId = emp.text()[:2]
-
+        self.groupBoxEmpProfile.show()
+        self.groupBoxEmpProfile.setTitle(self.selectedUserId)
+        
     def on_click_install(self):
         print('Installing {} Database'.format(self.host))
         self.dbInstall()
