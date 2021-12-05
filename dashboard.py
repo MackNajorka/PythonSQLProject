@@ -408,7 +408,7 @@ class dashboardApp(QDialog):
                             ;"""
             #Read data from SQL with pandas dataframe and export to csv file for report table
             df = pd.read_sql_query(employeeQuery,self.connection)
-            df.to_csv(f"reports/Employee_Tool_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
+            df.to_csv(f"reports/Employee_Bad_Standing_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
 
             #notify user of successful export
             notification.notify(title="Export Status", 
@@ -454,6 +454,9 @@ class dashboardApp(QDialog):
         if emps is not None:
             for emp in emps:
                 self.searchResultsList.addItem("{} {} {}".format(emp['empID'], emp['empFirstName'], emp['empLastName']))
+                notification.notify(title="Employee Tool Status", 
+                                message=f"Employee " + emp ['empFirstName'] + " " + emp ['empLastName']
+                                + " has " + str(emp['numTools']) + " tools in inventory.", timeout=15)
         else:
             print(f'No users found...')
             
