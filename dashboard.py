@@ -431,10 +431,13 @@ class dashboardApp(QDialog):
     # Search List Selected User Callback
     def on_click_searchResult(self, item):
         emp = self.searchResultsList.currentItem()
-        print(f'Selected users {emp.text()}')
-        self.selectedUserId = emp.text()[:2]
+        empString = emp.text()
+        print(f'Selected users {empString}')
+        #self.selectedUserId = empString[:2]
         self.groupBoxEmpProfile.show()
-        self.groupBoxEmpProfile.setTitle(self.selectedUserId)
+        empID, empFName, empLName = empString.split()
+        self.selectedUserId = empID
+        self.groupBoxEmpProfile.setTitle(f'Profile {empFName} {empLName}')
         
     def on_click_install(self):
         print('Installing {} Database'.format(self.host))
