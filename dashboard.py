@@ -378,6 +378,26 @@ class dashboardApp(QDialog):
         finally:
             self.connection.commit()
             cursor.close()
+            
+    def dbDeleteEmployee(self, empFirstName): 
+        try:  
+            if self.connection is None or not self.connection.is_connected():
+                return None
+            cursor = self.connection.cursor(dictionary=True)
+            query = "SELECT * FROM employee WHERE empfirstname = %s"
+            cursor.execute(query, (empFirstName, ))
+            records = cursor.fetchall()
+            self.connection.commit()
+            cursor.close()
+            print(records)
+    
+            cursor = self.connection.cursor(dictionary=True)
+            query = "DELETE FROM employee WHERE empFirstName = %s"
+            cursor.execute(query, (empFirstName, ))
+            self.connection.commit()
+            cursor.close()
+        except Error as e:
+            print("Error while deleting employee", e)
     
     def dbReportGenerateToExcelFile(self): #Randels function revised
         if self.connection is None or not self.connection.is_connected():
@@ -461,7 +481,9 @@ class dashboardApp(QDialog):
             print(f'No users found...')
             
     def on_click_terminate(self):
-        print("Terminate Stub")
+        empFirstName = self.searchBox.text()
+        self.dbDeleteEmployee(empFirstName)
+        print("Employee Terminated")
 
     def on_click_reports(self):
         self.dbReportGenerateToExcelFile()
