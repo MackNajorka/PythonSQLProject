@@ -417,7 +417,7 @@ class dashboardApp(QDialog):
                                     
             # Read data from SQL with pandas dataframe and export to csv file for report table
             df = pd.read_sql_query(reportsQuery,self.connection)
-            df.to_csv(f"reports/Inventory_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
+            df.to_csv(f"Inventory_report{datetime.datetime.now().strftime('%b-%d-%Y')}.csv", index=False)
 
             employeeQuery = """ SELECT 
                                     * 
